@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "MicronImg": {
-      "commandName": "Project",
-      "commandLineArgs": "-p \"test.png\""
-    }
-  }
-}
