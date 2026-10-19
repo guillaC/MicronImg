@@ -1,10 +1,8 @@
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 
 public static class ImageUtil
 {
-    public static Image<Rgba32>? LoadImageFromFile(string imagePath)
+    public static SKBitmap? LoadImageFromFile(string imagePath)
     {
         if (!File.Exists(imagePath))
         {
@@ -14,7 +12,8 @@ public static class ImageUtil
 
         try
         {
-            return Image.Load<Rgba32>(imagePath);
+            using var stream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
+            return SKBitmap.Decode(stream);
         }
         catch (Exception ex)
         {
@@ -23,7 +22,7 @@ public static class ImageUtil
         }
     }
 
-    public static async Task<Image<Rgba32>?> DownloadImageAsync(string url)
+    public static async Task<SKBitmap?> DownloadImageAsync(string url)
     {
         try
         {
@@ -32,7 +31,7 @@ public static class ImageUtil
             response.EnsureSuccessStatusCode();
 
             using var stream = await response.Content.ReadAsStreamAsync();
-            return await Image.LoadAsync<Rgba32>(stream);
+            return SKBitmap.Decode(stream);
         }
         catch (Exception ex)
         {
@@ -41,7 +40,7 @@ public static class ImageUtil
         }
     }
 
-    public static Image<Rgba32> ResizeImageForMicron(Image<Rgba32> image)
+    public static SKBitmap ResizeImageForMicron(SKBitmap image)
     {
         const int maxCharWidth = 130;
         const int maxCharHeight = 50;
@@ -59,7 +58,8 @@ public static class ImageUtil
             newWidth = (int)(newWidth * ratio);
             newHeight = (int)(newHeight * ratio);
 
-            image.Mutate(x => x.Resize(newWidth, newHeight));
+            var resizedBitmap = image.Resize(new SKImageInfo(newWidth, newHeight), SKFilterQuality.High);
+            return resizedBitmap ?? image;
         }
 
         return image;

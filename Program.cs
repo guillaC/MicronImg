@@ -1,5 +1,4 @@
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 using System.Text;
 
 var parsedArgs = CommandLineParser.Parse(args);
@@ -10,7 +9,7 @@ if (parsedArgs is null)
     Environment.Exit(0);
 }
 
-Image<Rgba32>? image = parsedArgs.IsUrl
+SKBitmap? image = parsedArgs.IsUrl
     ? await ImageUtil.DownloadImageAsync(parsedArgs.Path)
     : ImageUtil.LoadImageFromFile(parsedArgs.Path);
 
@@ -22,7 +21,7 @@ if (image is null)
 
 try
 {
-    Image<Rgba32> resized = ImageUtil.ResizeImageForMicron(image);
+    SKBitmap resized = ImageUtil.ResizeImageForMicron(image);
     string micronContent = MicronConverter.ConvertImageToMicron(resized);
     string outputPath = string.IsNullOrEmpty(parsedArgs.OutputPath)
         ? DetermineOutputPath(parsedArgs.Path, parsedArgs.IsUrl)
@@ -30,7 +29,7 @@ try
 
     await File.WriteAllTextAsync(outputPath, micronContent, Encoding.UTF8);
     Console.WriteLine($"Fichier genere : {outputPath}");
-    resized.Dispose();
+    resized?.Dispose();
 }
 finally
 {

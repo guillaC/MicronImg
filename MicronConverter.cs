@@ -1,10 +1,9 @@
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 using System.Text;
 
 public static class MicronConverter
 {
-    public static string ConvertImageToMicron(Image<Rgba32> image)
+    public static string ConvertImageToMicron(SKBitmap image)
     {
         int width = image.Width;
         int height = image.Height;
@@ -16,8 +15,8 @@ public static class MicronConverter
         {
             for (int x = 0; x < width; x++)
             {
-                Rgba32 pixel = image[x, y];
-                if (pixel.A >= 128 || ColorHelper.GetLuminance(pixel) > 40)
+                SKColor pixel = image.GetPixel(x, y);
+                if (pixel.Alpha >= 128 || ColorHelper.GetLuminance(pixel) > 40)
                 {
                     if (x < minX) minX = x;
                     if (x > maxX) maxX = x;
@@ -43,21 +42,21 @@ public static class MicronConverter
         {
             for (int x = minX; x <= maxX; x++)
             {
-                Rgba32 topPixel = image[x, y];
+                SKColor topPixel = image.GetPixel(x, y);
                 string topColor = ColorHelper.ColorToMicronHex(topPixel);
-                bool topTransparent = topPixel.A < 128;
+                bool topTransparent = topPixel.Alpha < 128;
 
-                Rgba32 bottomPixel;
+                SKColor bottomPixel;
                 bool bottomTransparent;
 
                 if (y + 1 < height)
                 {
-                    bottomPixel = image[x, y + 1];
-                    bottomTransparent = bottomPixel.A < 128;
+                    bottomPixel = image.GetPixel(x, y + 1);
+                    bottomTransparent = bottomPixel.Alpha < 128;
                 }
                 else
                 {
-                    bottomPixel = new Rgba32(0, 0, 0, 0);
+                    bottomPixel = new SKColor(0, 0, 0, 0);
                     bottomTransparent = true;
                 }
 
@@ -108,7 +107,7 @@ public static class MicronConverter
 
 public static class BlockSelector
 {
-    public static char SelectBlock(Rgba32 top, Rgba32 bottom, bool topTransparent, bool bottomTransparent)
+    public static char SelectBlock(SKColor top, SKColor bottom, bool topTransparent, bool bottomTransparent)
     {
         if (topTransparent && bottomTransparent)
             return ' ';
@@ -132,27 +131,27 @@ public static class BlockSelector
 
 public static class ColorHelper
 {
-    public static int ColorDistance(Rgba32 c1, Rgba32 c2)
+    public static int ColorDistance(SKColor c1, SKColor c2)
     {
-        int dr = c1.R - c2.R;
-        int dg = c1.G - c2.G;
-        int db = c1.B - c2.B;
+        int dr = c1.Red - c2.Red;
+        int dg = c1.Green - c2.Green;
+        int db = c1.Blue - c2.Blue;
         return (dr * dr + dg * dg + db * db);
     }
 
-    public static int GetLuminance(Rgba32 color)
+    public static int GetLuminance(SKColor color)
     {
-        return (int)(0.299 * color.R + 0.587 * color.G + 0.114 * color.B);
+        return (int)(0.299 * color.Red + 0.587 * color.Green + 0.114 * color.Blue);
     }
 
-    public static string ColorToMicronHex(Rgba32 color)
+    public static string ColorToMicronHex(SKColor color)
     {
-        if (color.A < 128)
+        if (color.Alpha < 128)
             return "000";
 
-        int r = (color.R >> 4) & 0xF;
-        int g = (color.G >> 4) & 0xF;
-        int b = (color.B >> 4) & 0xF;
+        int r = (color.Red >> 4) & 0xF;
+        int g = (color.Green >> 4) & 0xF;
+        int b = (color.Blue >> 4) & 0xF;
 
         return $"{r:X}{g:X}{b:X}";
     }
