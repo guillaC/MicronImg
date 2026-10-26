@@ -33,13 +33,15 @@ public static class MicronConverter
         maxY = ((maxY + 1) / 2) * 2;
 
         var sb = new StringBuilder();
-        sb.AppendLine("`c");
 
         string? previousFgColor = null;
         string? previousBgColor = null;
 
+        sb.AppendLine("`c");
+
         for (int y = minY; y < maxY; y += 2)
         {
+            var lineSb = new StringBuilder();
             for (int x = minX; x <= maxX; x++)
             {
                 SKColor topPixel = image.GetPixel(x, y);
@@ -64,7 +66,7 @@ public static class MicronConverter
 
                 if (topTransparent && bottomTransparent)
                 {
-                    sb.Append(' ');
+                    lineSb.Append(' ');
                     previousFgColor = null;
                     previousBgColor = null;
                     continue;
@@ -74,7 +76,7 @@ public static class MicronConverter
 
                 if (block == ' ')
                 {
-                    sb.Append(' ');
+                    lineSb.Append(' ');
                     previousFgColor = null;
                     previousBgColor = null;
                     continue;
@@ -82,25 +84,34 @@ public static class MicronConverter
 
                 if (topColor != previousFgColor && !topTransparent)
                 {
-                    sb.Append($"`F{topColor}");
+                    lineSb.Append($"`F{topColor}");
                     previousFgColor = topColor;
                 }
 
                 if (bottomColor != previousBgColor && !bottomTransparent)
                 {
-                    sb.Append($"`B{bottomColor}");
+                    lineSb.Append($"`B{bottomColor}");
                     previousBgColor = bottomColor;
                 }
 
-                sb.Append(block);
+                lineSb.Append(block);
             }
 
-            sb.AppendLine();
+            string line = lineSb.ToString().Trim();
+            if (!string.IsNullOrEmpty(line))
+            {
+                sb.AppendLine($"{line}`b`f");
+            }
+            else
+            {
+                sb.AppendLine();
+            }
             previousFgColor = null;
             previousBgColor = null;
         }
 
-        sb.AppendLine("`c");
+        sb.AppendLine("> Image To Micron page: https://github.com/guillaC/MicronImg");
+        sb.AppendLine("`a");
         return sb.ToString();
     }
 }
