@@ -1,15 +1,6 @@
 # MicronImg
-
-Create visual banners and headers for MICRON pages.
-Convert images into MICRON format for Reticulum networks.
-
-## About
-
-MICRON is a lightweight markup language designed for text rendering in constrained environments, making it perfect for mesh networks and low-bandwidth communications.
-
-MicronImg converts images (from URLs or local files) into text-based art optimized for **MICRON** format. Perfect for creating distinctive banners and headers on your Reticulum pages bringing visual identity to your `.mu` files without CSS, JavaScript, or other unsupported technologies.
-
-Display image-based artwork in Nomad Network and other MICRON-compatible clients while maintaining full compatibility with terminal rendering.
+MICRON is a lightweight markup language designed for constrained environments, making it ideal for mesh networks and low-bandwidth communications.
+Convert images into MICRON text art for Reticulum and NomadNet pages, ideal for logos, artwork and page decorations.
 
 ## Features
 
@@ -21,12 +12,12 @@ Display image-based artwork in Nomad Network and other MICRON-compatible clients
 
 ### From file path
 
-MicronImg.exe -p <path> [-o <output_file>]
+`MicronImg.exe -p <path> [-o <output_file>]`
 (or just drag and drop a file)
 
 ### From URL
 
-MicronImg.exe -u <url> [-o <output_file>]
+`MicronImg.exe -u <url> [-o <output_file>]`
 
 ## sample.mu
 
